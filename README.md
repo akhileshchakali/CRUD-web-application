@@ -1,2 +1,0 @@
-# minorproject
-minor project

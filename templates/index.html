@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Secure Full-Stack Data Hub</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <div class="auth-wrapper" id="authScreen">
+        
+        <div class="auth-card" id="loginCard">
+            <h2>User Portal Login</h2>
+            <form id="loginForm">
+                <div class="form_control"><label>Username:</label><input type="text" id="loginUser" required placeholder="Enter username"></div>
+                <div class="form_control"><label>Password:</label><input type="password" id="loginPass" required placeholder="Enter password"></div>
+                <button type="submit" class="auth-submit-btn">Log In</button>
+            </form>
+            <p class="toggle-auth-text">Forgot keys? <a href="#" id="toForgotLink">Recover Password</a></p>
+            <p class="toggle-auth-text">New user? <a href="#" id="toSignupLink">Register Account</a></p>
+        </div>
+
+        <div class="auth-card" id="signupCard" style="display: none;">
+            <h2>Account Registration</h2>
+            <form id="signupForm">
+                <div class="form_control"><label>Username:</label><input type="text" id="regUser" required placeholder="Create username"></div>
+                <div class="form_control"><label>Password:</label><input type="password" id="regPass" required placeholder="Create strong password"></div>
+                <div class="form_control">
+                    <label>Security Recovery Question:</label>
+                    <select id="regQuestion" style="width:100%; padding:10px; border-radius:5px; background:var(--dark4); color:white;">
+                        <option value="What is your native hometown name?">What is your native hometown name?</option>
+                        <option value="What was the name of your first school?">What was the name of your first school?</option>
+                        <option value="What is your favorite technical domain?">What is your favorite technical domain?</option>
+                    </select>
+                </div>
+                <div class="form_control"><label>Secret Recovery Answer:</label><input type="text" id="regAnswer" required placeholder="Enter answer"></div>
+                <button type="submit" class="auth-submit-btn">Register Account</button>
+            </form>
+            <p class="toggle-auth-text"><a href="#" class="backToLoginLink">Back to Login</a></p>
+        </div>
+
+        <div class="auth-card" id="forgotCard" style="display: none;">
+            <h2>Password Recovery</h2>
+            <form id="usernameVerifyForm">
+                <div class="form_control"><label>Provide Username:</label><input type="text" id="forgotUser" required placeholder="Enter account username"></div>
+                <button type="submit" class="auth-submit-btn">Fetch Recovery Details</button>
+            </form>
+            
+            <form id="recoveryVerificationForm" style="display: none; margin-top:15px; border-top:1px dashed var(--dark7); padding-top:15px;">
+                <p id="questionDisplay" style="color:orange; margin-bottom:10px; font-weight:bold;"></p>
+                <div class="form_control"><label>Your Security Answer:</label><input type="text" id="forgotAnswer" required placeholder="Type recovery answer"></div>
+                <div class="form_control"><label>New Secure Password:</label><input type="password" id="forgotNewPass" required placeholder="Enter new password"></div>
+                <button type="submit" class="auth-submit-btn" style="background:orange;">Reset Access Password</button>
+            </form>
+            <p class="toggle-auth-text"><a href="#" class="backToLoginLink">Return to Login Screen</a></p>
+        </div>
+    </div>
+
+
+    <div class="landing-wrapper" id="landingView" style="display: none;">
+        <div class="user-status-bar">
+            <span>Logged User: <strong id="displayUsername" style="color:lightgreen">User</strong></span>
+            <div style="display:flex; gap:10px">
+                <button id="openChangePassModalBtn" style="background:var(--dark5); color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;">Settings</button>
+                <button class="logout-btn globalLogout">Logout</button>
+            </div>
+        </div>
+        <div id="image"><img src="{{ url_for('static', filename='srec.jpg') }}" width="220" height="220" alt="Logo"></div>
+        <div id="titleContainer"><h1>CRUD WEB APPLICATION<br>Student Project Detail Data Management</h1></div>
+        <div id="userSelection">
+            <button class="addMemberBtn">New User Registration</button>
+            <button id="existingUserBtn">Existing User Details</button>
+        </div>
+    </div>
+
+        
+    <div id="crudApp" style="display: none; width: 100%;">
+        <div style="padding: 20px; max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+            <button id="goBackBtn" style="padding: 12px 25px; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 5px; background:var(--dark4); color:white; border:1px solid var(--dark6);">Go Back</button>
+            <button class="logout-btn globalLogout">Logout</button>
+        </div>
+        
+        <div class="container">
+            <header>
+                <div class="filterEntries">
+                    <div class="entries">
+                        Show <select id="table_size">
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select> entries
+                    </div>
+                    <h1 style="text-align: center; color:lightgreen; font-family:'Times New Roman', serif; font-weight:bold; font-size: 1.8rem; margin: 10px 0;">
+                        CRUD WEB APPLICATION<br><span style="font-size: 1.2rem;">Student Project Detail Data Management</span>
+                    </h1>
+                    <div class="filter"><label for="search">Search:</label><input type="search" id="search" placeholder="Enter keyword/Roll no"></div>
+                </div>
+            </header>
+
+            <div style="overflow-x: auto; width: 100%;">
+                <table>
+                    <thead>
+                        <tr class="heading">
+                            <th>SL No</th><th>Full Name</th><th>Roll No</th><th>Branch</th><th>Batch No</th><th>DOMAIN</th><th>Submission Date</th><th>Status</th><th>Email</th><th>Phone</th><th>Guide</th><th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="userInfo"></tbody>
+                </table>
+            </div>
+            <footer><span class="showEntries">Showing 0 to 0 of 0 entries</span><div class="pagination"></div></footer>
+        </div>
+    </div>
+
+
+    <div class="dark_bg" id="crudFormModal">
+        <div class="popup">
+            <header>
+                <h2 class="modalTitle" style="color:white">Fill the Form</h2>
+                <button class="closeBtn" id="closeCrudModalBtn">&times;</button>
+            </header>
+            <div class="body">
+                <form id="myForm">
+                    <div class="inputFieldContainer">
+                        <div class="nameField">
+                            <div class="form_control"><label>First Name:</label><input type="text" id="fName" required></div>
+                            <div class="form_control"><label>Last Name:</label><input type="text" id="lName" required></div>
+                        </div>
+                        <div class="ageCityField">
+                            <div class="form_control"><label>Roll No:</label><input type="text" id="rollNo" required></div>
+                            <div class="form_control"><label>Branch:</label><input type="text" id="branch" required></div>
+                        </div>
+                        <div class="postSalary">
+                            <div class="form_control"><label>Batch No:</label><input type="text" id="batchNo" required></div>
+                            <div class="form_control"><label>DOMAIN:</label><input type="text" id="domain" required></div>
+                        </div>
+                        <div class="form_control"><label>Submission Date:</label><input type="date" id="sDate" required></div>
+                        <div class="form_control">
+                            <label>Status:</label>     
+                            <select id="stat" style="width: 100%; padding: 10px; border-radius: 5px; background: var(--dark4); color: var(--dark8); border: 1px solid var(--dark6);">
+                                <option value="accepted">accepted</option><option value="rejected">rejected</option>
+                            </select>
+                        </div>
+                        <div class="form_control"><label>Email:</label><input type="email" id="email" required></div>
+                        <div class="form_control"><label>Phone:</label><input type="number" id="phone" required></div>
+                        <div class="form_control"><label>Guide:</label><input type="text" id="guide" required></div>
+                    </div>
+                </form>
+            </div>
+            <footer class="popupFooter"><button form="myForm" type="submit" class="submitBtn">Submit</button></footer>
+        </div>
+    </div>
+
+    <div class="dark_bg" id="changePassModal">
+        <div class="popup" style="max-width:400px">
+            <header>
+                <h2 style="color:white">Update Password</h2>
+                <button class="closeBtn" id="closeChangePassModalBtn">&times;</button>
+            </header>
+            <div class="body">
+                <form id="changePasswordForm">
+                    <div class="form_control"><label>Current Password:</label><input type="password" id="oldProfilePass" required></div>
+                    <div class="form_control"><label>New Secure Password:</label><input type="password" id="newProfilePass" required></div>
+                    <button type="submit" class="auth-submit-btn" style="background:lightgreen; color:black">Commit New Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='app.js') }}"></script>  
+</body>
+</html>
